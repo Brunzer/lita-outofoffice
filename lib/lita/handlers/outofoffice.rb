@@ -5,6 +5,7 @@ module Lita
     class Outofoffice < Handler
 
       route(/^ooo\s(.+)/i, :setOOO, command: true, help: { "ooo" => "Set days you will be out of office, ie 'ooo from today until Friday'"})
+      route(/^ooo delete/i, :delOOO, command: true, help: { "ooo delete" => "Deletes the Out Of Office data for your user"})
       route(/@/i, :isOOO, command: false)
 
       def fromDate(str)
@@ -52,6 +53,11 @@ module Lita
 	rescue ArgumentError
           response.reply("Something about your dates look funny to me. Fix it and try again")
         end
+      end
+
+      def delOOO(response)
+        redis.del(response.user.mention_name)
+        response.reply("I've removed your Out Of Office data #{response.user.name}")
       end
 
       def isOOO(response)
